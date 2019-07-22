@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>黑白棋</title>
+</head>
+<body>
+  <div class="container"></div>
+  <script>
+    let container = document.querySelector('.container');
+    let map = [
+      [0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 1, 2, 0, 0, 0],
+      [0, 0, 0, 2, 1, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0]
+    ];
+
+    //标识棋子颜色
+    let color = 1;
+
+    //创造棋盘
+    for(let x=0; x<map.length; x++){
+      for(let y=0; y<map[x].length; y++){
+        let ele = document.createElement('div');
+        ele.style = 'vertical-align: bottom;width: 50px;height: 50px;background-color: #a1d68b;display: inline-block;border: 1px solid #000;'
+        
+        // 点击棋盘事件
+        ele.addEventListener('click', (event) =>{
+
+          // 判断元素上有无棋子
+          if(ele.hasChildNodes()) return;
+
+          // 定义八个方向
+          let directions = [
+            [0, 1],
+            [1, 1],
+            [1, 0],
+            [1, -1],
+            [0, -1],
+            [-1, -1],
+            [-1, 0],
+            [-1, 1]
+          ]
+
+          //存储可以吃掉的棋子
+          let canEatArr = [];
+
+          // 循环判断八个方向是否可以吃子
+          for(let direction of directions){
+            let ox = x, oy = y;
+            //标识相邻棋子有无不同颜色的棋子
+            let hasOpposite = false;
+
+            // 标识是否可以吃子
+            let canEat = false;
+
+            // 存储可以吃掉的棋子
+            let arr = [];
+
+            // 判断此方向是否有可以吃掉的棋子
+            while(true){
+              ox += direction[0];
+              oy += direction[1];
+              // 超出界限跳出循环
+              if(ox >=8 || ox <0 || oy>=8 || oy<0)break; 
+              if(map[ox][oy] === 0) break;
+
+              if(map[ox][oy] === 3-color){
+                hasOpposite = true;
+                arr.push([ox,oy]);
+              }else{
+                if(hasOpposite){
+                  canEat = true;
+                  canEatArr = canEatArr.concat(arr);
+                }
+                break;
+              }
+            }
+          } 
+          // 水平方向向左判断是否可以吃子
+          // ox = x;
+          // while(++ox < 8){
+          //   if(map[ox][oy] === 0) break;
+          //   if(map[ox][oy] === 3-color){
+          //     hasOpposite = true;
+          //     arr.push([ox,oy]);
+          //   }else{
+          //     if(hasOpposite){
+          //       canEat = true;
+          //       canEatArr = canEatArr.concat(arr);
+          //     }else{
+          //      arr = [];
+          //     }
+          //     break;
+          //   }
+          // }
+
+          //  可以落子就是有子可以吃
+         
+            // 吃子
+            if(canEatArr.length!==0){
+
+              // 落子
+              let disc = document.createElement('div');
+              if(color ===1){
+                disc.style= 'width: 40px;height: 40px;background-color: #fff;border-radius: 50%;margin: 5px;'
+              }else{
+                disc.style= 'width: 40px;height: 40px;background-color: #000;border-radius: 50%;margin: 5px;'
+              }
+              ele.appendChild(disc);
+
+              //1.改变棋盘上的数字
+              map[x][y] = color ===1 ? 1 : 2 ; 
+              for(let i=0; i<canEatArr.length; i++){
+                let x = canEatArr[i][0], y=canEatArr[i][1];
+                map[x][y] = color ===1 ? 1 : 2 ;
+                // 改变棋子的颜色
+                let z = x*8+y+x;
+                let ele = container.children[z].children[0];
+                ele.style.backgroundColor = color ===1 ? '#fff' : '#000';
+              }
+               // 有子可吃才能切换黑白子
+              //切换黑白子
+              color = 3-color;
+              console.log(map);
+              console.log(color); 
+            }
+        }, false);
+        //判断是否是初始化的位置
+        if(map[x][y]===1){
+          let disc = document.createElement('div');
+          disc.style= 'width: 40px;height: 40px;background-color: #fff;border-radius: 50%;margin: 5px;'
+          ele.appendChild(disc);
+          // ele.removeEventListener('click', handleClick);
+        }
+        if(map[x][y]===2){
+          let disc = document.createElement('div');
+          disc.style= 'width: 40px;height: 40px;background-color: #000;border-radius: 50%;margin: 5px;'
+          ele.appendChild(disc);
+          // ele.removeEventListener('click', handleClick);
+        }
+        
+        container.appendChild(ele);
+      }
+      container.appendChild(document.createElement('br'));
+    }
+
+  </script>
+</body>
+</html>
