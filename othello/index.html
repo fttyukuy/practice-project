@@ -72,12 +72,12 @@
             downChess(ele, x, y);
             // 吃子
             eatChess(canEatArr);
+            result();
             return;
           }
         }
       }
     }
-
 
     // 手动
     function downAndEat(ele, x , y) {
@@ -91,8 +91,48 @@
           // 吃子
           eatChess(canEatArr);
         }
+        result();
     }
     
+    // 判断结果
+    function result() {
+      if(!isDownChess()){
+        hasResult();
+      }
+    }
+    // 棋盘是否还可以能落子
+    function isDownChess(){
+      let isDown = false;
+      for(let x=0; x<map.length; x++){
+        for(let y=0; y<map[x].length; y++){
+          if(map[x][y]!==0){continue}
+          let canEatArr = canEatChess(x, y);
+          if(canEatArr.length !== 0){
+            return isDown = true;
+          }
+        }
+      }
+      return isDown;
+    }
+
+    // 计算双方棋子数目
+    function hasResult() {
+      let num1=0, num2=0;
+      for(let x=0; x<map.length; x++){
+        for(let y=0; y<map[x].length; y++){
+          if(map[x][y]===1) num1++;
+          else if(map[x][y]===2) num2++;
+          else continue;
+        }
+      }
+      if(num1>num2){
+        console.log('白子获胜');
+      }else if(num1<num2){
+        console.log('黑子获胜')
+      }else{
+        console.log('平局');
+      }
+    }
 
     // 封装一个获取能吃掉的棋子 数组的函数
     function canEatChess(x , y) {
