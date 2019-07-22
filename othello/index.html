@@ -24,20 +24,80 @@
     //标识棋子颜色
     let color = 1;
 
-    //创造棋盘
+    //初始化棋盘
     for(let x=0; x<map.length; x++){
       for(let y=0; y<map[x].length; y++){
         let ele = document.createElement('div');
         ele.style = 'vertical-align: bottom;width: 50px;height: 50px;background-color: #a1d68b;display: inline-block;border: 1px solid #000;'
         
-        // 点击棋盘事件
-        ele.addEventListener('click', (event) =>{
+         //判断是否是初始化的位置
+         if(map[x][y]===1){
+          let disc = document.createElement('div');
+          disc.style= 'width: 40px;height: 40px;background-color: #fff;border-radius: 50%;margin: 5px;'
+          ele.appendChild(disc);
+        }
+        if(map[x][y]===2){
+          let disc = document.createElement('div');
+          disc.style= 'width: 40px;height: 40px;background-color: #000;border-radius: 50%;margin: 5px;'
+          ele.appendChild(disc);
+        }
+        container.appendChild(ele);
 
+        // 点击事件
+        ele.addEventListener('click', (event) =>{
           // 判断元素上有无棋子
           if(ele.hasChildNodes()) return;
 
-          // 定义八个方向
-          let directions = [
+          if(color ===1){
+            downAndEat(ele, x , y)
+            if(color===2){
+              setTimeout(AI, 1000);
+            } 
+          }
+        }, false);
+      }
+      container.appendChild(document.createElement('br'));
+    }
+
+    // AI
+    function AI () {
+      for(let x=0; x<map.length; x++){
+        for(let y=0; y<map[x].length; y++){
+          if(map[x][y]!==0){continue}
+          let canEatArr = canEatChess(x, y);
+          if(canEatArr.length === 0)continue;
+          else{
+            let ele = getEle([x,y]);
+            // 落子
+            downChess(ele, x, y);
+            // 吃子
+            eatChess(canEatArr);
+            return;
+          }
+        }
+      }
+    }
+
+
+    // 手动
+    function downAndEat(ele, x , y) {
+      let canEatArr = canEatChess(x, y);
+
+      //  可以落子就是有子可以吃
+        // 吃子
+        if(canEatArr.length!==0){
+          // 落子
+          downChess(ele, x, y);
+          // 吃子
+          eatChess(canEatArr);
+        }
+    }
+    
+
+    // 封装一个获取能吃掉的棋子 数组的函数
+    function canEatChess(x , y) {
+      // 定义八个方向
+      let directions = [
             [0, 1],
             [1, 1],
             [1, 0],
@@ -48,109 +108,82 @@
             [-1, 1]
           ]
 
-          //存储可以吃掉的棋子
-          let canEatArr = [];
+      //存储可以吃掉的棋子
+      let canEatArr = [];
 
-          // 循环判断八个方向是否可以吃子
-          for(let direction of directions){
-            let ox = x, oy = y;
-            //标识相邻棋子有无不同颜色的棋子
-            let hasOpposite = false;
+      // 循环判断八个方向是否可以吃子
+      for(let direction of directions){
+        let ox = x, oy = y;
+        //标识相邻棋子有无不同颜色的棋子
+        let hasOpposite = false;
 
-            // 标识是否可以吃子
-            let canEat = false;
+        // 标识是否可以吃子
+        let canEat = false;
 
-            // 存储可以吃掉的棋子
-            let arr = [];
+        // 存储可以吃掉的棋子
+        let arr = [];
 
-            // 判断此方向是否有可以吃掉的棋子
-            while(true){
-              ox += direction[0];
-              oy += direction[1];
-              // 超出界限跳出循环
-              if(ox >=8 || ox <0 || oy>=8 || oy<0)break; 
-              if(map[ox][oy] === 0) break;
+        // 判断此方向是否有可以吃掉的棋子
+        while(true){
+          ox += direction[0];
+          oy += direction[1];
+          // 超出界限跳出循环
+          if(ox >=8 || ox <0 || oy>=8 || oy<0)break; 
+          if(map[ox][oy] === 0) break;
 
-              if(map[ox][oy] === 3-color){
-                hasOpposite = true;
-                arr.push([ox,oy]);
-              }else{
-                if(hasOpposite){
-                  canEat = true;
-                  canEatArr = canEatArr.concat(arr);
-                }
-                break;
-              }
+          if(map[ox][oy] === 3-color){
+            hasOpposite = true;
+            arr.push([ox,oy]);
+          }else{
+            if(hasOpposite){
+              canEat = true;
+              canEatArr = canEatArr.concat(arr);
             }
-          } 
-          // 水平方向向左判断是否可以吃子
-          // ox = x;
-          // while(++ox < 8){
-          //   if(map[ox][oy] === 0) break;
-          //   if(map[ox][oy] === 3-color){
-          //     hasOpposite = true;
-          //     arr.push([ox,oy]);
-          //   }else{
-          //     if(hasOpposite){
-          //       canEat = true;
-          //       canEatArr = canEatArr.concat(arr);
-          //     }else{
-          //      arr = [];
-          //     }
-          //     break;
-          //   }
-          // }
-
-          //  可以落子就是有子可以吃
-         
-            // 吃子
-            if(canEatArr.length!==0){
-
-              // 落子
-              let disc = document.createElement('div');
-              if(color ===1){
-                disc.style= 'width: 40px;height: 40px;background-color: #fff;border-radius: 50%;margin: 5px;'
-              }else{
-                disc.style= 'width: 40px;height: 40px;background-color: #000;border-radius: 50%;margin: 5px;'
-              }
-              ele.appendChild(disc);
-
-              //1.改变棋盘上的数字
-              map[x][y] = color ===1 ? 1 : 2 ; 
-              for(let i=0; i<canEatArr.length; i++){
-                let x = canEatArr[i][0], y=canEatArr[i][1];
-                map[x][y] = color ===1 ? 1 : 2 ;
-                // 改变棋子的颜色
-                let z = x*8+y+x;
-                let ele = container.children[z].children[0];
-                ele.style.backgroundColor = color ===1 ? '#fff' : '#000';
-              }
-               // 有子可吃才能切换黑白子
-              //切换黑白子
-              color = 3-color;
-              console.log(map);
-              console.log(color); 
-            }
-        }, false);
-        //判断是否是初始化的位置
-        if(map[x][y]===1){
-          let disc = document.createElement('div');
-          disc.style= 'width: 40px;height: 40px;background-color: #fff;border-radius: 50%;margin: 5px;'
-          ele.appendChild(disc);
-          // ele.removeEventListener('click', handleClick);
+            break;
+          }
         }
-        if(map[x][y]===2){
-          let disc = document.createElement('div');
-          disc.style= 'width: 40px;height: 40px;background-color: #000;border-radius: 50%;margin: 5px;'
-          ele.appendChild(disc);
-          // ele.removeEventListener('click', handleClick);
-        }
-        
-        container.appendChild(ele);
       }
-      container.appendChild(document.createElement('br'));
+      return canEatArr; 
     }
-
+  
+    // 落子并改变棋盘上的数字函数
+    function downChess(ele, x, y){
+      let disc = document.createElement('div');
+        if(color ===1){
+          disc.style= 'width: 40px;height: 40px;background-color: #fff;border-radius: 50%;margin: 5px;'
+        }else{
+          disc.style= 'width: 40px;height: 40px;background-color: #000;border-radius: 50%;margin: 5px;'
+        }
+        ele.appendChild(disc);
+        map[x][y] = color ===1 ? 1 : 2 ;
+    }
+  
+    // 吃子
+    function eatChess(arr) {
+      for(let i=0; i<arr.length; i++){
+            let x = arr[i][0], y=arr[i][1];
+            let ele = getEle([x,y], true);
+             //改变棋盘上的数字
+            map[x][y] = color ===1 ? 1 : 2 ;
+            // 改变棋子的颜色
+            ele.style.backgroundColor = color ===1 ? '#fff' : '#000';
+          }
+      // 有子可吃才能切换黑白子
+      //切换黑白子
+      color = 3-color;
+    }
+  
+  //根据坐标获取元素函数 ，第一个参数为坐标数组，第二参数为布尔值： false代表获取坐标元素，true代表获取坐标元素的子元素。
+  function getEle(arr, bol=false){
+    let x = arr[0], y=arr[1], z = x*8+y+x;
+    let ele = null;
+    if(bol){
+       ele = container.children[z].children[0];
+    }else{
+      ele = container.children[z];
+    }
+    return ele;
+  }
   </script>
 </body>
 </html>
