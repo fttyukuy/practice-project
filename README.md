@@ -1,3 +1,3 @@
 # practice-project
- ## nine-gird : 九宫格
- ## othello ： 黑白棋
+ # nine-gird : 九宫格
+ # othello ： 黑白棋
